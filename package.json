@@ -1,0 +1,44 @@
+{
+    "name": "",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "deploy": "bash deploy.sh",
+        "dev": "nodemon src/index.ts",
+        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+        "lint": "tslint -p tsconfig.json",
+        "lint-fix": "tslint -p tsconfig.json --fix",
+        "postversion": "git push && git push --tags",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm test && npm run lint",
+        "preversion": "npm run lint",
+        "test": "jest --config jestconfig.json",
+        "version": "npm run format && git add -A src"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:filiptypjeu/"
+    },
+    "homepage": "https://github.com/filiptypjeu/",
+    "author": "Filip Stenbacka",
+    "license": "ISC",
+    "types": "dist/index.d.ts",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "@types/jest": "^24.0.25",
+        "jest": "^24.9.0",
+        "prettier": "^1.19.1",
+        "ts-jest": "^24.3.0",
+        "ts-node": "^8.6.1",
+        "tslint": "^5.20.1",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^3.7.4"
+    },
+    "files": [
+      "dist/**/*"
+    ],
+    "keywords": []
+}
