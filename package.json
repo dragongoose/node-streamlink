@@ -1,5 +1,5 @@
 {
-    "name": "",
+    "name": "vulvapoller",
     "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
@@ -14,22 +14,28 @@
         "prepare": "npm run build",
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint",
+        "start": "node dist/index.js",
         "test": "jest --config jestconfig.json",
         "version": "npm run format && git add -A src"
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:filiptypjeu/"
+        "url": "git@github.com:filiptypjeu/vulvapoller.git"
     },
-    "homepage": "https://github.com/filiptypjeu/",
+    "homepage": "https://github.com/filiptypjeu/vulvapoller",
     "author": "Filip Stenbacka",
     "license": "ISC",
     "types": "dist/index.d.ts",
     "dependencies": {
+        "dgram": "^1.0.1",
+        "events": "^3.1.0"
     },
     "devDependencies": {
+        "@types/events": "^3.0.0",
         "@types/jest": "^24.0.25",
+        "@types/node": "^13.7.4",
         "jest": "^24.9.0",
+        "nodemon": "^2.0.2",
         "prettier": "^1.19.1",
         "ts-jest": "^24.3.0",
         "ts-node": "^8.6.1",
@@ -38,7 +44,7 @@
         "typescript": "^3.7.4"
     },
     "files": [
-      "dist/**/*"
+        "dist/**/*"
     ],
     "keywords": []
 }
