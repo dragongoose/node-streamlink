@@ -16,21 +16,31 @@ export interface IProduct {
 }
 
 export class VulvaPoller extends EventEmitter {
-  private interval: number;
+  private msg: string;
   private socket: dgram.Socket;
+  private port: number;
+  private address: string | undefined;
   private slots: ISlot[] = [];
+  private open: boolean = false;
 
-  public constructor(interval: number, port: number, address?: string) {
+  public constructor(msg: string, port: number, address?: string) {
     super();
-    this.interval = interval;
-    this.interval;
+    this.msg = msg;
+    this.port = port;
+    this.address = address;
     this.socket = dgram.createSocket("udp4");
 
-    this.socket.on("connect", () => console.log("Connected."));
-    this.socket.on("listening", () => console.log("Listening."));
-    this.socket.on("close", () => console.log("Close."));
+    this.socket.on("connect", () => {
+      this.open = true;
+      this.emit("connect");
+    });
+    this.socket.on("close", () => {
+      this.open = false;
+      this.emit("close");
+    });
+    this.socket.on("listening", () => this.emit("listening"));
     this.socket.on('error', (err) => {
-      console.log(`this. error:\n${err.stack}`);
+      this.emit("error", err);
       this.socket.close();
     });
 
@@ -47,7 +57,7 @@ export class VulvaPoller extends EventEmitter {
       this.handleNewStatus(a);
     });
 
-    this.socket.connect(port, address);
+    this.socket.connect(this.port, this.address);
   }
 
   private handleNewStatus = (slots: ISlot[]) => {
@@ -58,7 +68,7 @@ export class VulvaPoller extends EventEmitter {
 
     if (this.slots.length === 0) {
       this.slots = slots;
-      console.log(new Date().toUTCString(), "Starting point set.", this.slots);
+      this.emit("message", "Starting point set");
       return;
     }
 
@@ -92,7 +102,7 @@ export class VulvaPoller extends EventEmitter {
       } else if (change < 0) {
         removed.push({
           name: slot.name,
-          amount: change,
+          amount: -change,
         });
       }
     });
@@ -107,33 +117,22 @@ export class VulvaPoller extends EventEmitter {
     this.slots = slots;
   }
 
-  public send = (msg: string) => {
-    this.socket.send(msg);
+  public startPolling = (interval: number, times?: number) => {
+    if (Number(times) <= 0) {
+      return;
+    }
+    setTimeout(() => {
+      if (this.open) {
+        this.emit("message", `Polling${times ? ` (${times - 1} times left)` : ""}.`);
+        this.socket.send(this.msg);
+        this.startPolling(interval, times === undefined ? undefined : times - 1);
+      } else {
+        this.emit("error", "Cannot poll, becasue the socket is closed.");
+      }
+    }, interval);
   }
 
   public close = () => {
     this.socket.close();
   }
-
 }
-
-const poller = new VulvaPoller(1000, 14243, "82.130.59.165");
-
-poller.on("added", (products: IProduct[]) => {
-  console.log(new Date().toUTCString(), "added", products);
-});
-
-poller.on("removed", (products: IProduct[]) => {
-  console.log(new Date().toUTCString(), "removed", products);
-});
-
-// poller.on("status", (slots: ISlot[]) => {
-//   console.log(new Date().toUTCString(), "status", slots.map(slot => { return `${slot.slot}: ${slot.name} (${slot.amount})${slot.status ? " [" + slot.status + "]" : ""}`}), "\n");
-// });
-
-const poll = () => {
-  poller.send("s");
-  setTimeout(() => poll(), 5000);
-}
-
-setTimeout(() => poll(), 1000);
