@@ -18,7 +18,7 @@ export interface IProduct {
 export class VulvaPoller extends EventEmitter {
   private interval: number;
   private socket: dgram.Socket;
-  private slots: Map<string, number> = new Map<string, number>();
+  private slots: ISlot[] = [];
 
   public constructor(interval: number, port: number, address?: string) {
     super();
@@ -56,31 +56,38 @@ export class VulvaPoller extends EventEmitter {
       return;
     }
 
-    const map = new Map<string, number>();
-    const added: IProduct[] = [];
-    const removed: IProduct[] = [];
-
-    slots.forEach(s => {
-      map.set(s.name, map.get(s.name) || 0 + s.amount);
-    });
-
-    if (this.slots.size === 0) {
-      this.slots = map;
-      console.log(new Date().toUTCString(), "Starting point set.", map);
+    if (this.slots.length === 0) {
+      this.slots = slots;
+      console.log(new Date().toUTCString(), "Starting point set.", this.slots);
       return;
     }
 
-    map.forEach((newAmount, name) => {
-      const oldAmount = this.slots.get(name) || 0;
-      if (newAmount > oldAmount) {
+    const added: IProduct[] = [];
+    const removed: IProduct[] = [];
+
+    slots.forEach((slot, i) => {
+      if (slot.name !== this.slots[i].name) {
         added.push({
-          name,
-          amount: newAmount - oldAmount,
+          name: slot.name,
+          amount: slot.amount,
         });
-      } else if (oldAmount > newAmount) {
         removed.push({
-          name,
-          amount: oldAmount - newAmount,
+          name: this.slots[i].name,
+          amount: this.slots[i].amount,
+        });
+        return;
+      }
+
+      const change = slot.amount - this.slots[i].amount;
+      if (change > 0) {
+        added.push({
+          name: slot.name,
+          amount: change,
+        });
+      } else if (change < 0) {
+        removed.push({
+          name: slot.name,
+          amount: change,
         });
       }
     });
@@ -92,7 +99,7 @@ export class VulvaPoller extends EventEmitter {
       this.emit("removed", removed);
     }
 
-    this.slots = map;
+    this.slots = slots;
   }
 
   public send = (msg: string) => {
