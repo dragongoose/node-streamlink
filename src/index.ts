@@ -67,14 +67,19 @@ export class VulvaPoller extends EventEmitter {
 
     slots.forEach((slot, i) => {
       if (slot.name !== this.slots[i].name) {
-        added.push({
-          name: slot.name,
-          amount: slot.amount,
-        });
-        removed.push({
-          name: this.slots[i].name,
-          amount: this.slots[i].amount,
-        });
+        if (slot.amount > 0) {
+          added.push({
+            name: slot.name,
+            amount: slot.amount,
+          });
+        }
+
+        if (this.slots[i].amount > 0) {
+          removed.push({
+            name: this.slots[i].name,
+            amount: this.slots[i].amount,
+          });
+        }
         return;
       }
 
