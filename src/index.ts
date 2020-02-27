@@ -1,6 +1,11 @@
 import dgram from "dgram";
 import { EventEmitter } from "events";
 
+export interface IProduct {
+  amount: number;
+  name: string;
+}
+
 export interface ISlot {
   slot: number;
   amount: number;
@@ -10,9 +15,15 @@ export interface ISlot {
 
 type VulvaStatus = "EMPTY" | "DISABLED" | "POSITIONERROR";
 
-export interface IProduct {
-  amount: number;
-  name: string;
+export declare interface VulvaPoller {
+  on(event: 'connect'): this;
+  on(event: 'close'): this;
+  on(event: 'listening'): this;
+  on(event: 'message', listening: (msg: string) => void): this;
+  on(event: 'error', listening: (error: Error) => void): this;
+  on(event: 'status', listening: (slots: ISlot[]) => void): this;
+  on(event: 'added', listening: (products: IProduct[]) => void): this;
+  on(event: 'removed', listening: (products: IProduct[]) => void): this;
 }
 
 export class VulvaPoller extends EventEmitter {
@@ -62,7 +73,7 @@ export class VulvaPoller extends EventEmitter {
 
   private handleNewStatus = (slots: ISlot[]) => {
     if (slots.length !== 8) {
-      this.emit("error", `Vulva status has length ${slots.length} !== 8.`)
+      this.emit("error", new Error(`Vulva status has length ${slots.length} !== 8.`));
       return;
     }
 
