@@ -11,11 +11,11 @@ export interface IEnd {
 }
 
 export declare interface Streamlink {
-  on(event: 'begin', listening: (link: string) => void): this;
-  on(event: 'end', listening: (info: IEnd) => void): this;
-  on(event: 'close', listening: () => void): this;
-  on(event: 'error', listening: (error: Error) => void): this;
-  on(event: 'log', listening: (log: string) => void): this;
+  on(event: "begin", listening: (link: string) => void): this;
+  on(event: "end", listening: (info: IEnd) => void): this;
+  on(event: "close", listening: () => void): this;
+  on(event: "error", listening: (error: Error) => void): this;
+  on(event: "log", listening: (log: string) => void): this;
 }
 
 export class Streamlink extends EventEmitter {
@@ -40,7 +40,7 @@ export class Streamlink extends EventEmitter {
   public quality = (quality: string) => {
     this.qual = quality;
     return this;
-  }
+  };
 
   public isLive = (callback: (isLive: boolean) => void) => {
     exec("streamlink -j " + this.stream, (_err, stdout, _stderr) => {
@@ -52,7 +52,7 @@ export class Streamlink extends EventEmitter {
         callback(false);
       }
     });
-  }
+  };
 
   public begin = () => {
     if (this.outputLocation && fs.existsSync(this.outputLocation)) {
@@ -89,7 +89,7 @@ export class Streamlink extends EventEmitter {
       this.emit("begin", this.stream);
     });
     return this;
-  }
+  };
 
   public end = (exitCode: number) => {
     if (this.streaming) {
@@ -107,11 +107,11 @@ export class Streamlink extends EventEmitter {
       this.emit("end", res);
     }
 
-    if (this.child) { 
+    if (this.child) {
       kill(this.child.pid);
     }
     return;
-  }
+  };
 
   public getQualities = (): void => {
     this.isLive(live => {
@@ -122,5 +122,5 @@ export class Streamlink extends EventEmitter {
 
       this.emit("quality", this.qualities);
     });
-  }
+  };
 }
