@@ -60,13 +60,13 @@ export class Streamlink extends EventEmitter {
 
   public begin = () => {
     if (this.outputLocation && fs.existsSync(this.outputLocation)) {
-      this.emit("error", "File already exists.");
+      this.emit("error", "Can not create stream, file already exists.");
       return this;
     }
 
     this.isLive(live => {
       if (!live) {
-        this.emit("error", "Is not live.");
+        this.emit("error", "Can not start stream, stream is not live.");
         return;
       }
 

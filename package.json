@@ -45,5 +45,12 @@
   "files": [
     "dist/**/*"
   ],
-  "keywords": ["streamlink", "stream", "vlc", "youtube", "twitch", "live"]
+  "keywords": [
+    "streamlink",
+    "stream",
+    "vlc",
+    "youtube",
+    "twitch",
+    "live"
+  ]
 }
