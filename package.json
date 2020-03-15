@@ -1,50 +1,49 @@
 {
-    "name": "vulvapoller",
-    "version": "1.0.0",
-    "description": "",
-    "main": "dist/index.js",
-    "scripts": {
-        "build": "tsc",
-        "deploy": "bash deploy.sh",
-        "dev": "nodemon src/index.ts",
-        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-        "lint": "tslint -p tsconfig.json",
-        "lint-fix": "tslint -p tsconfig.json --fix",
-        "postversion": "git push && git push --tags",
-        "prepare": "npm run build",
-        "prepublishOnly": "npm test && npm run lint",
-        "preversion": "npm run lint",
-        "start": "node dist/index.js",
-        "test": "jest --config jestconfig.json",
-        "version": "npm run format && git add -A src"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:filiptypjeu/vulvapoller.git"
-    },
-    "homepage": "https://github.com/filiptypjeu/vulvapoller",
-    "author": "Filip Stenbacka",
-    "license": "ISC",
-    "types": "dist/index.d.ts",
-    "dependencies": {
-        "dgram": "^1.0.1",
-        "events": "^3.1.0"
-    },
-    "devDependencies": {
-        "@types/events": "^3.0.0",
-        "@types/jest": "^24.0.25",
-        "@types/node": "^13.7.4",
-        "jest": "^24.9.0",
-        "nodemon": "^2.0.2",
-        "prettier": "^1.19.1",
-        "ts-jest": "^24.3.0",
-        "ts-node": "^8.6.1",
-        "tslint": "^5.20.1",
-        "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.7.4"
-    },
-    "files": [
-        "dist/**/*"
-    ],
-    "keywords": []
+  "name": "@filiptypjeu/streamlink",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "bash deploy.sh",
+    "dev": "nodemon src/index.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "lint-fix": "tslint -p tsconfig.json --fix",
+    "postversion": "git push && git push --tags",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "start": "node dist/index.js",
+    "test": "jest --config jestconfig.json",
+    "version": "npm run format && git add -A src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:filiptypjeu/npm-streamlink.git"
+  },
+  "homepage": "https://github.com/filiptypjeu/npm-streamlink",
+  "author": "Filip Stenbacka",
+  "license": "ISC",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "fs-extra": "^4.0.2",
+    "tree-kill": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/node": "^13.7.4",
+    "jest": "^24.9.0",
+    "nodemon": "^2.0.2",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
+    "ts-node": "^8.6.1",
+    "tslint": "^5.20.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.7.4"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "keywords": ["streamlink", "stream", "vlc", "youtube", "twitch", "live"]
 }
