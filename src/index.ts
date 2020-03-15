@@ -44,11 +44,15 @@ export class Streamlink extends EventEmitter {
 
   public isLive = (callback: (isLive: boolean) => void) => {
     exec("streamlink -j " + this.stream, (_err, stdout, _stderr) => {
-      const json = JSON.parse(stdout);
-      if (!json.error) {
-        this.qualities = Object.keys(json.streams);
-        callback(true);
-      } else {
+      try {
+        const json = JSON.parse(stdout);
+        if (!json.error) {
+          this.qualities = Object.keys(json.streams);
+          callback(true);
+        } else {
+          callback(false);
+        }
+      } catch {
         callback(false);
       }
     });
