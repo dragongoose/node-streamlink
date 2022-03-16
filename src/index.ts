@@ -10,6 +10,25 @@ export interface IEnd {
   stream: string;
 }
 
+interface IOutput {
+  error?: string;
+  plugin?: string;
+  metadata?: {
+    id: string;
+    author: string;
+    category: string;
+    title: string;
+  };
+  streams?: {
+    [quality: string]: {
+      type: "hls" | "http" | "muxed-stream" | "dash" | "hls7" | string;
+      url: string;
+      headers: any;
+      master: string;
+    };
+  };
+}
+
 export declare interface Streamlink {
   on(event: "begin", listening: (link: string) => void): this;
   on(event: "end", listening: (info: IEnd) => void): this;
@@ -43,17 +62,13 @@ export class Streamlink extends EventEmitter {
   };
 
   public isLive = (callback: (isLive: boolean) => void) => {
-    exec("streamlink -j " + this.stream, (_err, stdout, _stderr) => {
-      try {
-        const json = JSON.parse(stdout);
-        if (!json.error) {
-          this.qualities = Object.keys(json.streams);
-          callback(true);
-        } else {
-          callback(false);
-        }
-      } catch {
+    exec("streamlink --json " + this.stream, (_err, stdout) => {
+      const json = JSON.parse(stdout) as IOutput;
+      if (json.error) {
         callback(false);
+      } else {
+        this.qualities = Object.keys(json.streams!);
+        callback(true);
       }
     });
   };
@@ -80,11 +95,11 @@ export class Streamlink extends EventEmitter {
       this.startTime = Date.now();
 
       this.child = spawn("streamlink", args);
-      this.child.stdout.on("data", d => {
-        this.emit("log", d.toString());
+      this.child.stdout.on("data", chunk => {
+        this.emit("log", chunk);
       });
 
-      this.child.on("close", (code, _st) => {
+      this.child.on("close", code => {
         this.emit("close");
         this.end(code);
       });
