@@ -121,7 +121,8 @@ export class Streamlink extends EventEmitter {
 
     this.child.on("close", code => {
       this.emit("close");
-      this.end(code);
+      if (!code) code = 1
+      this.end(code | 1);
     });
 
     this.streaming = true;
@@ -134,7 +135,7 @@ export class Streamlink extends EventEmitter {
    * Ends the stream and destrots streamlink
    * @param exitCode Code to exit with
    */
-  public end = (exitCode: number) => {
+  public end = (exitCode: number ) => {
     if (this.streaming) {
       const res: IEnd = {
         exitCode,
