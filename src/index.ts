@@ -70,7 +70,7 @@ export class Streamlink extends EventEmitter {
    * @returns boolean
    */
   public isLive = (): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       exec("streamlink --json " + this.stream, (_err, stdout) => {
         const json = JSON.parse(stdout) as IOutput;
 
