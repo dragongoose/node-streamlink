@@ -1,6 +1,6 @@
 {
   "name": "@dragongoose/streamlink",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Streamlink wrapper for Node.js",
   "main": "dist/index.js",
   "scripts": {

@@ -37,9 +37,9 @@ export declare interface Streamlink {
 }
 
 export interface StreamlinkOptions {
-  outputLocation: string
-  outputStdout: boolean
-  otherArgs: string[]
+  outputLocation?: string
+  outputStdout?: boolean
+  otherArgs?: string[]
 }
 
 export class Streamlink extends EventEmitter {
