@@ -75,7 +75,7 @@ export class Streamlink extends EventEmitter {
         const json = JSON.parse(stdout) as IOutput;
 
         if (json.error) {
-          reject(new Error("Unknown json parsing error"))
+          resolve(false)
         } else {
           this.qualities = Object.keys(json.streams!);
           resolve(true)
