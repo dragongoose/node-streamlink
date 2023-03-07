@@ -1,5 +1,5 @@
 {
-  "name": "@filiptypjeu/streamlink",
+  "name": "@dragongoose/streamlink",
   "version": "1.0.2",
   "description": "Streamlink wrapper for Node.js",
   "main": "dist/index.js",
@@ -18,14 +18,8 @@
     "type": "git",
     "url": "git@github.com:filiptypjeu/npm-streamlink.git"
   },
-  "homepage": "https://github.com/filiptypjeu/npm-streamlink",
-  "author": "Filip Stenbacka",
-  "license": "ISC",
+  "homepage": "https://github.com/dragongoose/node-streamlink",
   "types": "dist/index.d.ts",
-  "dependencies": {
-    "fs-extra": "^10.0.1",
-    "tree-kill": "^1.2.0"
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
