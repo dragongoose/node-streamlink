@@ -1,7 +1,6 @@
 import { ChildProcessWithoutNullStreams, exec, spawn } from "child_process";
 import { EventEmitter } from "events";
 import fs from "fs";
-import kill from "tree-kill";
 
 export interface IEnd {
   exitCode?: number | string;
@@ -37,76 +36,86 @@ export declare interface Streamlink {
   on(event: "log", listening: (log: string) => void): this;
 }
 
+export interface StreamlinkOptions {
+  outputLocation: string
+  outputStdout: boolean
+  otherArgs: string[]
+}
+
 export class Streamlink extends EventEmitter {
   public stream: string;
   public streaming: boolean = false;
-  private outputLocation?: string;
   private qual: string = "best";
   private child?: ChildProcessWithoutNullStreams;
   private startTime?: number;
   private qualities: string[] = [];
+  private options: StreamlinkOptions;
 
-  constructor(stream: string) {
+  constructor(stream: string, startingOptions: StreamlinkOptions) {
     super();
     this.stream = stream;
+    this.options = startingOptions
   }
-
-  public output = (location: string) => {
-    this.outputLocation = location;
-    return this;
-  };
 
   public quality = (quality: string) => {
     this.qual = quality;
     return this;
   };
 
-  public isLive = (callback: (isLive: boolean) => void) => {
-    exec("streamlink --json " + this.stream, (_err, stdout) => {
-      const json = JSON.parse(stdout) as IOutput;
-      if (json.error) {
-        callback(false);
-      } else {
-        this.qualities = Object.keys(json.streams!);
-        callback(true);
-      }
-    });
+  public isLive = (): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      exec("streamlink --json " + this.stream, (_err, stdout) => {
+        const json = JSON.parse(stdout) as IOutput;
+
+        if (json.error) {
+          reject(false)
+        } else {
+          this.qualities = Object.keys(json.streams!);
+          resolve(true)
+        }
+      });
+    })
   };
 
-  public begin = () => {
-    if (this.outputLocation && fs.existsSync(this.outputLocation)) {
+  public begin = async () => {
+    if (this.options.outputLocation && fs.existsSync(this.options.outputLocation)) {
       this.emit("error", "Can not create stream, file already exists.");
       return this;
     }
 
-    this.isLive(live => {
-      if (!live) {
-        this.emit("error", "Can not start stream, stream is not live.");
-        return;
-      }
+    const isLive = await this.isLive()
+    if (!isLive) {
+      this.emit("error", "Can not start stream, stream is not live.");
+      return;
+    }
 
-      const args = [];
-      if (this.outputLocation) {
-        args.push("-o");
-        args.push(this.outputLocation);
-      }
-      args.push(this.stream);
-      args.push(this.qual);
-      this.startTime = Date.now();
+    const args = [];
+    if (this.options.outputLocation) {
+      args.push("-o");
+      args.push(this.options.outputLocation);
+    }
 
-      this.child = spawn("streamlink", args);
-      this.child.stdout.on("data", chunk => {
-        this.emit("log", chunk);
-      });
+    if (this.options.outputStdout) {
+      args.push("--stdout");
+    }
 
-      this.child.on("close", code => {
-        this.emit("close");
-        this.end(code);
-      });
+    args.push(this.stream);
+    args.push(this.qual);
+    this.startTime = Date.now();
 
-      this.streaming = true;
-      this.emit("begin", this.stream);
+    this.child = spawn("streamlink", args);
+    this.child.stdout.on("data", chunk => {
+      this.emit("log", chunk);
     });
+
+    this.child.on("close", code => {
+      this.emit("close");
+      this.end(code);
+    });
+
+    this.streaming = true;
+    this.emit("begin", this.stream);
+
     return this;
   };
 
@@ -114,7 +123,7 @@ export class Streamlink extends EventEmitter {
     if (this.streaming) {
       const res: IEnd = {
         exitCode,
-        output: this.outputLocation,
+        output: this.options.outputLocation,
         stream: this.stream,
       };
 
@@ -127,19 +136,18 @@ export class Streamlink extends EventEmitter {
     }
 
     if (this.child) {
-      kill(this.child.pid);
+      this.child.kill('SIGINT')
     }
     return;
   };
 
-  public getQualities = (): void => {
-    this.isLive(live => {
-      if (!live) {
-        this.emit("error", "Can not get qualities, stream is not live.");
-        return;
-      }
+  public getQualities = async (): Promise<string[]> => {
+    const isLive = await this.isLive()
+    if (!isLive) {
+      const error = new Error("Can not get qualities, stream is not live.");
+      return Promise.reject(error)
+    }
 
-      this.emit("quality", this.qualities);
-    });
+    return this.qualities
   };
 }
