@@ -57,11 +57,18 @@ export class Streamlink extends EventEmitter {
     this.options = startingOptions
   }
 
-  public quality = (quality: string) => {
+  /**
+   * Sets the quality for the stream
+   * @param quality Quality to use, can be retrieved from getQualties()
+   */
+  public quality = (quality: string): void => {
     this.qual = quality;
-    return this;
   };
 
+  /**
+   * Gets if the stream is currently live
+   * @returns boolean
+   */
   public isLive = (): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       exec("streamlink --json " + this.stream, (_err, stdout) => {
@@ -77,16 +84,20 @@ export class Streamlink extends EventEmitter {
     })
   };
 
+  /**
+   * If the stream is live, it will start retriving the stream based on your options
+   * @returns Promise<void>
+   */
   public begin = async () => {
     if (this.options.outputLocation && fs.existsSync(this.options.outputLocation)) {
-      this.emit("error", "Can not create stream, file already exists.");
-      return this;
+      const error = new Error("Can not create stream, file already exists.");
+      return Promise.reject(error)
     }
 
     const isLive = await this.isLive()
     if (!isLive) {
-      this.emit("error", "Can not start stream, stream is not live.");
-      return;
+      const error = new Error("Can not start stream, stream is not live.");
+      return Promise.reject(error);
     }
 
     const args = [];
@@ -116,9 +127,13 @@ export class Streamlink extends EventEmitter {
     this.streaming = true;
     this.emit("begin", this.stream);
 
-    return this;
+    return Promise.resolve()
   };
 
+  /**
+   * Ends the stream and destrots streamlink
+   * @param exitCode Code to exit with
+   */
   public end = (exitCode: number) => {
     if (this.streaming) {
       const res: IEnd = {
@@ -141,6 +156,10 @@ export class Streamlink extends EventEmitter {
     return;
   };
 
+  /**
+   * Gets all the avalible qualities on the stream
+   * @returns string[] that includes all avaliable qualities
+   */
   public getQualities = async (): Promise<string[]> => {
     const isLive = await this.isLive()
     if (!isLive) {
