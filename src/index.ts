@@ -110,6 +110,10 @@ export class Streamlink extends EventEmitter {
       args.push("--stdout");
     }
 
+    if (this.options.otherArgs && this.options.otherArgs.length > 0) {
+      args.push(...this.options.otherArgs)
+    }
+
     args.push(this.stream);
     args.push(this.qual);
     this.startTime = Date.now();
